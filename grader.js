@@ -66,24 +66,26 @@ if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html')
-		.option('-u, --url <url>','Url to html file')
+	.option('-u, --url <url>','Url to html file')
         .parse(process.argv);
     var checkJson; 
-	if (program.file){
+	if (program.file != null){
 		checkJson = checkHtmlFile(fs.readFileSync(program.file), program.checks);
-	}else if(program.url){
+		var outJson = JSON.stringify(checkJson, null, 4);
+		console.log(outJson);
+	}else if(program.url != null){
 		rest.get(program.url).on('complete', function(result) {
 			if (result instanceof Error) {
-				throw "Error when fetching html from url";
+			    console.log("Error when fetching html from url");
 			} else {
 				checkJson = checkHtmlFile(result, program.checks);
+				var outJson = JSON.stringify(checkJson, null, 4);
+				console.log(outJson);
 			}
 		});
 	}else{
-		throw "Must specify a file or url"; 
-	}
-    var outJson = JSON.stringify(checkJson, null, 4);
-    console.log(outJson);
+	    console.log("Must specify a file or url"); 
+        }
 } else {
     exports.checkHtmlFile = checkHtmlFile;
 }
